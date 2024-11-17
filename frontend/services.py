@@ -19,7 +19,7 @@ def send_message(queue_name, message): #All queue_names and messages are declard
     )
     connection.close()
 
-def consume_message(queue_name, delay=5): #All queue_names and messages are declards inside app.py specific functions
+def consume_message(queue_name, delay=10): #All queue_names and messages are declards inside app.py specific functions
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host))
     channel = connection.channel()
     channel.queue_declare(queue=queue_name, durable=True)
