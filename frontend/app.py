@@ -178,6 +178,7 @@ def search_jobs():
         job_title = request.form.get('job_title')
         location = request.form.get('location')
         job_results = fetch_job_results(job_title, location)
+        print(f"from app.py: {job_results}")
         return render_template('search.html', jobs=job_results)
     
     return render_template('search.html')

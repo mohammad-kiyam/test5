@@ -3,11 +3,11 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-rabbitmq_host = '10.147.17.228'  # Update this to your RabbitMQ server's address
-api_key = os.getenv('API_KEY')  # Fetch API key from .env file
+rabbitmq_host = '10.147.17.228'
+api_key = os.getenv('API_KEY')
 
 # RabbitMQ Functions
-def send_message(queue_name, message): #All queue_names and messages are declards inside app.py specific functions
+def send_message(queue_name, message): #All queue_names and messages are declards inside app.py
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host))
     channel = connection.channel()
     channel.queue_declare(queue=queue_name, durable=True)
@@ -19,11 +19,11 @@ def send_message(queue_name, message): #All queue_names and messages are declard
     )
     connection.close()
 
-def consume_message(queue_name, delay=10): #All queue_names and messages are declards inside app.py specific functions
+def consume_message(queue_name, delay=5): #All queue_names and messages are declards inside app.py
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host))
     channel = connection.channel()
     channel.queue_declare(queue=queue_name, durable=True)
-    time.sleep(delay)  # Optional delay to allow message processing
+    time.sleep(delay)  # delay needed for message to reach all the way around
     method_frame, header_frame, body = channel.basic_get(queue=queue_name, auto_ack=True)
     connection.close()
 
@@ -40,30 +40,39 @@ def consume_message(queue_name, delay=10): #All queue_names and messages are dec
 
 # External API Functions
 def fetch_job_results(job_title, location):
-    url = "https://api.apijobs.dev/v1/job/search"
+    url = "https://linkedin-data-api.p.rapidapi.com/search-jobs"
     headers = {
-        'apikey': api_key,
-        'Content-Type': 'application/json'
+	"x-rapidapi-key": "5ad49cae09msh9ca2d0578e8a801p168e63jsnbc6c9895684c",
+	"x-rapidapi-host": "linkedin-api8.p.rapidapi.com"
+}
+    querystring = {
+        "keywords": job_title,
+        "location" : location
     }
-    payload = {
-        'q': job_title,
-        'country': location
-    }
-    
-    response = requests.post(url, json=payload, headers=headers)
 
-    if response.status_code == 200:
-        job_results = response.json().get('hits', [])
-        formatted_jobs = [
+    try:
+        response = requests.get(url, headers=headers, params=querystring)
+        print(f"Request URL: {response.url}")
+        print(f"Response Code: {response.status_code}")
+        print(f"Text: Response: {response.text}")
+        print(f"JSON Response: {response.json()}")
+        response.raise_for_status()
+        jobs = response.json().get('data', [])
+        return [
             {
-                'title': job.get('title'),
-                'company': job.get('hiringOrganizationName', 'Google'),
-                'location': job.get('region', 'N/A'),
-                'salary': job.get('baseSalaryMaxValue', '$75,000'),
-                'job_url': job.get('url'),
-                'description': job.get('description', 'Find out more on their website!'),
-            } for job in job_results
+                'title': job.get('title', 'N/A'),
+                'company_name': job.get('company', {}).get('name', 'N/A'),
+                'benefits': job.get('benefits', 'N/A'),
+                'location': job.get('location', 'N/A'),
+                'job_url': job.get('url', '#'),
+                'description': job.get('description', 'Description not available'),
+                'employment_type': job.get('type', 'N/A'),
+                'post_date': job.get('postDate', 'N/A'),
+                'company_logo': job.get('company', {}).get('logo', 'N/A'),
+                'company_url': job.get('company', {}).get('url', 'N/A')
+            }
+            for job in jobs
         ]
-        return formatted_jobs
-    
-    return []
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return []

@@ -14,6 +14,7 @@
     .navbar .nav-links {
         display: flex;
         gap: 30px;
+        align-items: center;
     }
     .navbar .nav-links a {
         color: #fff;
@@ -44,22 +45,75 @@
         background-color: #482685;
         transform: scale(0.95);
     }
+
+/* Profile Dropdown Section */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #444;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 100%;
+    margin-top: 5px;
+    width: 200px;
+}
+
+.dropdown-content a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    padding: 5px 15px;
+    font-size: 16px;
+}
+
+.dropdown-content a:hover {
+    background-color: #555;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.profile-button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 5px;
+    text-align: center;
+    position: relative;
+}
+
 </style>
 
 <nav class="navbar">
     <a href="/" class="title-link">
-        <h1>
-            JobQuest
-        </h1>
-
+        <h1>JobQuest</h1>
     </a>
     <div class="nav-links">
         {% if is_logged_in %}
             <a href="/dashboard">Dashboard</a>
             <a href="/search">Search</a>
             <a href="/friends">Friends</a>
-            <a href="/logout">Logout</a>
-            <a href="/resetpassword">Reset Password</a>
+            <div class="dropdown">
+                <button class="profile-button">Profile ▼</button>
+                <div class="dropdown-content">
+                    <a href="/resetpassword">About</a>
+                    <a href="/resetpassword">Resume</a>
+                    <a href="/resetpassword">Reset Password</a>
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
         {% else %}
             <a href="/login">Login</a>
             <a href="/register">Register</a>
@@ -69,8 +123,8 @@
 </nav>
 
 <script>
-     // Toggle Dark Mode and Update Button Text
-     document.getElementById('toggle-dark-mode').addEventListener('click', function() {
+    // Toggle Dark Mode and Update Button Text
+    document.getElementById('toggle-dark-mode').addEventListener('click', function() {
         document.body.classList.toggle('dark-mode');
         // Update button text based on the current mode
         this.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';

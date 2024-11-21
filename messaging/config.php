@@ -1,7 +1,7 @@
 <?php
 return [
     'rabbitmq' => [
-        'host' => '10.147.17.228',
+        'host' => '100.64.1.1',
         'port' => 5672,
         'username' => 'guest',
         'password' => 'guest',

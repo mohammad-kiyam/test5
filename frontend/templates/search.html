@@ -9,11 +9,9 @@
        .job-description {
            overflow: hidden;
            display: -webkit-box;
-           /*-webkit-line-clamp: 3; /* Show 3 lines initially */
            -webkit-box-orient: vertical;
        }
        .job-description.expanded {
-           /*-webkit-line-clamp: unset; /* Show full text when expanded */
            overflow: visible;
        }
        .read-more {
@@ -51,9 +49,11 @@
                 {% for job in jobs %}
                     <li class="job-item">
                         <h3>{{ job.title }}</h3>
-                        <p><strong>Company:</strong> {{ job.company }}</p>
+                        <p><strong>Company:</strong> {{ job.company_name }}</p>
                         <p><strong>Location:</strong> {{ job.location }}</p>
-                        <p><strong>Salary:</strong> {{ job.salary }}</p>
+                        <p><strong>Salary:</strong> {{ job.benefits }}</p>
+                        <p><strong>Type:</strong> {{ job.employment_type }}</p>
+                        {{job.company_logo}}
                         <p><a href="{{ job.job_url }}" target="_blank" class="job-link">View Job</a></p>
                         <p class="job-description" data-index="{{ loop.index }}">
                             {{ job.description or 'Description not available.' }}
